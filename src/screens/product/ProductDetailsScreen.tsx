@@ -7,11 +7,19 @@ import {
   StyleSheet,
   TouchableOpacity,
   Pressable,
+  ActivityIndicator,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CollectionStackParamList } from '../../navigation/types';
-import { useCart } from '../../context/CartContext';
-import products from '../../data/products.json';
+import { useCart } from '../../state/CartContext';
+import { api } from '../../services/api';
+import { Product } from '../../types/product';
+import { ErrorScreen } from '../../components/ui/ErrorScreen';
+import { LoadingScreen } from '../../components/ui/LoadingScreen';
+import { Card } from '../../components/ui/Card';
+import { Typography } from '../../components/ui/Typography';
+import { formatCurrency } from '../../utils/formatCurrency';
+import { Button } from '../../components/ui/Button';
 
 type Props = NativeStackScreenProps<CollectionStackParamList, 'ProductDetails'>;
 
@@ -19,22 +27,23 @@ const ProductDetailsScreen = ({ route }: Props) => {
   const { id } = route.params;
   const { addItem } = useCart();
   const [loading, setLoading] = React.useState(true);
-  const [product, setProduct] = React.useState<(typeof products)[0] | null>(null);
+  const [product, setProduct] = React.useState<Product | null>(null);
   const [selectedVariantId, setSelectedVariantId] = React.useState<string>('');
   const [showVariants, setShowVariants] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        await new Promise(resolve => setTimeout(resolve, 300));
-        const foundProduct = products.find(p => p.id === id) || null;
-        setProduct(foundProduct);
-        if (foundProduct) {
-          // Set the first available variant as default
-          const defaultVariant = foundProduct.variants.find(v => v.availableForSale);
-          setSelectedVariantId(defaultVariant?.id || foundProduct.variants[0].id);
+        const product = await api.getProductById(id);
+        setProduct(product);
+        if (product) {
+          const defaultVariant = product.variants.find(v => v.availableForSale);
+          setSelectedVariantId(defaultVariant?.id || product.variants[0].id);
         }
+      } catch (err) {
+        setError('Failed to load product details');
       } finally {
         setLoading(false);
       }
@@ -59,19 +68,15 @@ const ProductDetailsScreen = ({ route }: Props) => {
   };
 
   if (loading) {
-    return (
-      <View style={[styles.container, styles.centerContent]}>
-        <Text>Loading...</Text>
-      </View>
-    );
+    return <LoadingScreen />;
+  }
+
+  if (error) {
+    return <ErrorScreen title="Error" message={error} />;
   }
 
   if (!product) {
-    return (
-      <View style={[styles.container, styles.centerContent]}>
-        <Text>Product not found</Text>
-      </View>
-    );
+    return <ErrorScreen title="Not Found" message="Product not found" />;
   }
 
   const selectedVariant = product.variants.find(v => v.id === selectedVariantId);
@@ -79,16 +84,18 @@ const ProductDetailsScreen = ({ route }: Props) => {
   return (
     <ScrollView style={styles.container}>
       <Image source={{ uri: product.images[0].url }} style={styles.image} />
-      <View style={styles.content}>
-        <Text style={styles.title}>{product.title}</Text>
-        <Text style={styles.price}>
-          ${selectedVariant?.price.amount || product.priceRange.minVariantPrice.amount}
-        </Text>
+      <Card style={styles.content}>
+        <Typography variant="h2">{product.title}</Typography>
+        <Typography variant="h3" color="#666" style={styles.price}>
+          {formatCurrency(
+            selectedVariant?.price.amount || product.priceRange.minVariantPrice.amount
+          )}
+        </Typography>
 
         {/* Variant Selection */}
         <Pressable style={styles.variantSelector} onPress={() => setShowVariants(!showVariants)}>
-          <Text style={styles.variantTitle}>Selected: {selectedVariant?.title || 'Default'}</Text>
-          <Text>{showVariants ? '▼' : '▶'}</Text>
+          <Typography variant="body">Selected: {selectedVariant?.title || 'Default'}</Typography>
+          <Typography variant="body">{showVariants ? '▼' : '▶'}</Typography>
         </Pressable>
 
         {showVariants && (
@@ -102,33 +109,32 @@ const ProductDetailsScreen = ({ route }: Props) => {
                   !variant.availableForSale && styles.unavailableVariant,
                 ]}
                 onPress={() => variant.availableForSale && setSelectedVariantId(variant.id)}>
-                <Text
-                  style={[
-                    styles.variantItemText,
-                    !variant.availableForSale && styles.unavailableText,
-                  ]}>
+                <Typography
+                  variant="body"
+                  color={!variant.availableForSale ? '#999' : undefined}
+                  style={!variant.availableForSale && styles.unavailableText}>
                   {variant.title}
                   {!variant.availableForSale && ' (Out of Stock)'}
-                </Text>
+                </Typography>
               </Pressable>
             ))}
           </View>
         )}
 
-        <Text style={styles.description}>{product.description}</Text>
+        <Typography variant="body" style={styles.description}>
+          {product.description}
+        </Typography>
 
-        <TouchableOpacity
-          style={[
-            styles.addToCartButton,
-            !selectedVariant?.availableForSale && styles.disabledButton,
-          ]}
+        <Button
+          title={selectedVariant?.availableForSale ? 'Add to Cart' : 'Out of Stock'}
           onPress={handleAddToCart}
-          disabled={!selectedVariant?.availableForSale}>
-          <Text style={styles.addToCartText}>
-            {selectedVariant?.availableForSale ? 'Add to Cart' : 'Out of Stock'}
-          </Text>
-        </TouchableOpacity>
-      </View>
+          disabled={!selectedVariant?.availableForSale}
+          variant="primary"
+          size="large"
+          fullWidth
+          style={styles.addToCartButton}
+        />
+      </Card>
     </ScrollView>
   );
 };
@@ -144,27 +150,13 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   content: {
-    padding: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 8,
+    margin: 16,
   },
   price: {
-    fontSize: 18,
-    color: '#666',
-    marginBottom: 16,
+    marginTop: 8,
   },
   description: {
-    fontSize: 16,
-    lineHeight: 24,
-    color: '#444',
     marginTop: 16,
-  },
-  centerContent: {
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   variantSelector: {
     flexDirection: 'row',
@@ -173,19 +165,15 @@ const styles = StyleSheet.create({
     padding: 12,
     backgroundColor: '#f5f5f5',
     borderRadius: 8,
-    marginBottom: 8,
-  },
-  variantTitle: {
-    fontSize: 16,
-    color: '#333',
+    marginTop: 16,
   },
   variantList: {
-    marginBottom: 16,
+    marginTop: 8,
   },
   variantItem: {
     padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderRadius: 8,
+    marginBottom: 8,
   },
   selectedVariant: {
     backgroundColor: '#e8f0fe',
@@ -193,28 +181,11 @@ const styles = StyleSheet.create({
   unavailableVariant: {
     opacity: 0.5,
   },
-  variantItemText: {
-    fontSize: 16,
-    color: '#333',
-  },
   unavailableText: {
     textDecorationLine: 'line-through',
-    color: '#999',
   },
   addToCartButton: {
-    backgroundColor: '#007AFF',
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  disabledButton: {
-    backgroundColor: '#ccc',
-  },
-  addToCartText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    marginTop: 24,
   },
 });
 

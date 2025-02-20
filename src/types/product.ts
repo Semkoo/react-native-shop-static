@@ -540,9 +540,64 @@
 //   "collections": ["all-products", "sweatshirts", "featured-collection", "hoodies"]
 // },
 
-export interface Product {
+export interface Money {
+  amount: string;
+  currencyCode: string;
+}
+
+export interface PriceRange {
+  minVariantPrice: Money;
+  maxVariantPrice: Money;
+}
+
+export interface ProductImage {
+  id: string;
+  url: string;
+  altText?: string | null;
+  width?: number;
+  height?: number;
+}
+
+export interface ProductOption {
   id: string;
   name: string;
-  description?: string;
-  price: number;
+  values: string[];
+}
+
+export interface SelectedOption {
+  name: string;
+  value: string;
+}
+
+export interface ProductVariant {
+  id: string;
+  title: string;
+  sku: string;
+  price: Money;
+  compareAtPrice: Money | null;
+  quantityAvailable: number;
+  availableForSale: boolean;
+  currentlyNotInStock: boolean;
+  selectedOptions: SelectedOption[];
+  image: ProductImage;
+}
+
+export interface Product {
+  id: string;
+  title: string;
+  description: string;
+  descriptionHtml: string;
+  handle: string;
+  productType: string;
+  tags: string[];
+  vendor: string;
+  availableForSale: boolean;
+  priceRange: PriceRange;
+  compareAtPriceRange: PriceRange;
+  images: ProductImage[];
+  options: ProductOption[];
+  variants: ProductVariant[];
+  requiresSellingPlan: boolean;
+  onlineStoreUrl: string;
+  collections: string[];
 }

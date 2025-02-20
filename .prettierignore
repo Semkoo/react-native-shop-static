@@ -1,3 +1,11 @@
 types/expo.d.ts
 nativewind-env.d.ts
 expo-env.d.ts
+.github/
+.bundle/
+android/
+coverage/
+ios/
+node_modules/
+patches/
+vendor/

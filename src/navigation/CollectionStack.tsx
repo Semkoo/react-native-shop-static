@@ -12,12 +12,15 @@ export function CollectionStackNavigator() {
       <Stack.Screen
         name="ProductList"
         component={ProductListScreen}
-        options={{ title: 'Products', headerShown: false }}
+        options={{ title: 'Collections', headerShown: false }}
       />
       <Stack.Screen
         name="ProductDetails"
         component={ProductDetailsScreen}
-        options={{ title: 'Product Details' }}
+        options={{
+          title: 'Product Details',
+          headerBackTitle: 'Collections',
+        }}
       />
     </Stack.Navigator>
   );

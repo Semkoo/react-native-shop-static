@@ -11,7 +11,7 @@ This project follows a clean architecture pattern with the following structure:
   - `screens/` - Screen components
   - `navigation/` - Navigation configuration
   - `services/` - API and business logic
-  - `context/` - State management
+  - `state/` - State management - React Context
   - `types/` - TypeScript type definitions
   - `utils/` - Helper functions and utilities
 

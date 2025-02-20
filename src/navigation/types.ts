@@ -10,6 +10,6 @@ export type CartStackParamList = {
 };
 
 export type RootTabParamList = {
-  Collection: NavigatorScreenParams<CollectionStackParamList>;
+  Collections: NavigatorScreenParams<CollectionStackParamList>;
   Cart: NavigatorScreenParams<CartStackParamList>;
 };

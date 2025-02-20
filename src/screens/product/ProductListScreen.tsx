@@ -1,56 +1,69 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  Image,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-  SafeAreaView,
-} from 'react-native';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { FlatList, StyleSheet, Dimensions, SafeAreaView, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CollectionStackParamList } from '../../navigation/types';
-import products from '../../data/products.json';
+import { api } from '../../services/api';
+import { Product } from '../../types/product';
+import { LoadingScreen } from '../../components/ui/LoadingScreen';
+import { ErrorScreen } from '../../components/ui/ErrorScreen';
+import { ProductCard } from '../../components/ProductCard';
+import useGridDimensions from '../../hooks/useGridDimensions';
 
 type Props = NativeStackScreenProps<CollectionStackParamList, 'ProductList'>;
 
 // Get the screen width to calculate the item width
-const { width } = Dimensions.get('window');
 const numColumns = 2;
-const gap = 16;
-const itemWidth = (width - gap * (numColumns + 1)) / numColumns;
+const gap = 12;
 
 const ProductListScreen = ({ navigation }: Props) => {
+  const { columnWidth } = useGridDimensions(numColumns, gap);
+
+  const [products, setProducts] = React.useState<Product[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
+  const fetchProducts = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await api.getProducts();
+      // Ensure the API client properly types the response
+      setProducts(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load products');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  if (error) {
+    return <ErrorScreen title="Error" message={error} onRetry={fetchProducts} />;
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.container}>
-        <FlatList
-          data={products}
-          keyExtractor={item => item.id}
-          numColumns={2}
-          contentContainerStyle={styles.listContent}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.productCard}
-              onPress={() =>
-                navigation.navigate('ProductDetails', {
-                  id: item.id,
-                })
-              }>
-              <Image source={{ uri: item.images[0].url }} style={styles.image} />
-              <View style={styles.details}>
-                <Text style={styles.title} numberOfLines={2}>
-                  {item.title}
-                </Text>
-                <Text style={styles.price}>
-                  ${parseFloat(item.priceRange.minVariantPrice.amount).toFixed(2)}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          )}
-        />
-      </View>
+      <FlatList
+        data={products}
+        keyExtractor={item => item.id}
+        numColumns={2}
+        contentContainerStyle={styles.listContent}
+        renderItem={({ item, index }) => (
+          <View style={[styles.productCard, { width: columnWidth }]} key={index}>
+            <ProductCard
+              product={item}
+              onPress={() => navigation.navigate('ProductDetails', { id: item.id })}
+            />
+          </View>
+        )}
+      />
     </SafeAreaView>
   );
 };
@@ -62,40 +75,11 @@ const styles = StyleSheet.create({
   },
   listContent: {
     padding: gap,
+    gap: gap,
   },
   productCard: {
-    width: itemWidth,
-    marginBottom: gap,
-    marginRight: gap,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  image: {
-    width: '100%',
-    height: itemWidth * 1.2,
-    resizeMode: 'cover',
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-  },
-  details: {
-    padding: 8,
-  },
-  title: {
-    fontSize: 14,
-    fontWeight: '500',
-    marginBottom: 4,
-  },
-  price: {
-    fontSize: 14,
-    color: '#666',
+    flex: 1,
+    padding: gap / 2,
   },
 });
 

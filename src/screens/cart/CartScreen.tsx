@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, Image, Alert, TouchableOpacity } from 'react-native';
-import { type CartItem, useCart } from '../../context/CartContext';
+import { type CartItem, useCart } from '../../state/CartContext';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 const CartItem = React.memo(
   ({
@@ -16,7 +17,7 @@ const CartItem = React.memo(
       <Image source={{ uri: item.image }} style={styles.itemImage} />
       <View style={styles.itemDetails}>
         <Text style={styles.itemTitle}>{item.title}</Text>
-        <Text style={styles.itemPrice}>${item.price.toFixed(2)}</Text>
+        <Text style={styles.itemPrice}>{formatCurrency(item.price)}</Text>
         <View style={styles.quantityContainer}>
           <TouchableOpacity
             onPress={() => onUpdateQuantity(item.variantId, Math.max(0, item.quantity - 1))}
@@ -91,7 +92,7 @@ const CartScreen = () => {
         contentContainerStyle={styles.listContent}
       />
       <View style={styles.footer}>
-        <Text style={styles.total}>Total: ${state.total.toFixed(2)}</Text>
+        <Text style={styles.total}>Total: {formatCurrency(state.total)}</Text>
       </View>
     </View>
   );
