@@ -1,33 +1,31 @@
 import React from 'react';
 import { Text, StyleSheet, TextStyle, StyleProp } from 'react-native';
 
+type TypographyVariant =
+  | 'h1'
+  | 'h2'
+  | 'h3'
+  | 'h4'
+  | 'h5'
+  | 'h6'
+  | 'body'
+  | 'body1'
+  | 'caption'
+  | 'label'
+  | 'subtitle1'
+  | 'subtitle2';
+type TextAlignment = 'auto' | 'left' | 'right' | 'center' | 'justify';
+
 interface TypographyProps {
-  variant?: 'h1' | 'h2' | 'h3' | 'h4' | 'body' | 'caption' | 'label';
+  variant?: TypographyVariant;
   color?: string;
-  align?: 'auto' | 'left' | 'right' | 'center' | 'justify';
+  align?: TextAlignment;
   style?: StyleProp<TextStyle>;
   children: React.ReactNode;
   numberOfLines?: number;
 }
 
-export const Typography: React.FC<TypographyProps> = ({
-  variant = 'body',
-  color,
-  align,
-  style,
-  children,
-  numberOfLines,
-}) => {
-  return (
-    <Text
-      style={[styles[variant], color && { color }, align && { textAlign: align }, style]}
-      numberOfLines={numberOfLines}>
-      {children}
-    </Text>
-  );
-};
-
-const styles = StyleSheet.create({
+const typographyStyles: Record<TypographyVariant, TextStyle> = {
   h1: {
     fontSize: 32,
     fontWeight: 'bold',
@@ -48,9 +46,23 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     lineHeight: 24,
   },
+  h5: {
+    fontSize: 16,
+    fontWeight: '600',
+    lineHeight: 24,
+  },
+  h6: {
+    fontSize: 14,
+    fontWeight: '600',
+    lineHeight: 20,
+  },
   body: {
     fontSize: 16,
     lineHeight: 24,
+  },
+  body1: {
+    fontSize: 14,
+    lineHeight: 20,
   },
   caption: {
     fontSize: 14,
@@ -62,4 +74,34 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     lineHeight: 20,
   },
-});
+  subtitle1: {
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  subtitle2: {
+    fontSize: 14,
+    lineHeight: 20,
+  },
+};
+
+export const Typography = React.memo<TypographyProps>(
+  ({ variant = 'body', color, align, style, children, numberOfLines }) => {
+    const combinedStyles: StyleProp<TextStyle> = React.useMemo(() => {
+      const styles = [
+        typographyStyles[variant],
+        color && { color },
+        align && { textAlign: align },
+        style,
+      ];
+      return styles;
+    }, [variant, color, align, style]);
+
+    return (
+      <Text style={combinedStyles} numberOfLines={numberOfLines}>
+        {children}
+      </Text>
+    );
+  }
+);
+
+Typography.displayName = 'Typography';

@@ -6,7 +6,7 @@ import { api } from '../../services/api';
 import { Product } from '../../types/product';
 import { LoadingScreen } from '../../components/LoadingScreen';
 import { ErrorScreen } from '../../components/ErrorScreen';
-import { ProductCard } from '../../components/ProductCard';
+import { ProductCard } from '../../components/product/ProductCard';
 import useGridDimensions from '../../hooks/useGridDimensions';
 
 type Props = NativeStackScreenProps<CollectionStackParamList, 'ProductList'>;

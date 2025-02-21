@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Image, StyleSheet, Pressable } from 'react-native';
-import { Product } from '../types/product';
-import { Card } from './ui/Card';
-import { Typography } from './ui/Typography';
-import { formatCurrency } from '../utils/formatCurrency';
+import { Product } from '../../types/product';
+import { Card } from '../ui/Card';
+import { Typography } from '../ui/Typography';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 interface ProductCardProps {
   product: Product;

@@ -9,12 +9,12 @@ import {
   StyleProp,
 } from 'react-native';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger';
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger' | 'ghost';
 export type ButtonSize = 'small' | 'medium' | 'large';
 
 interface ButtonProps {
   onPress: () => void;
-  title: string;
+  title?: string;
   variant?: ButtonVariant;
   size?: ButtonSize;
   disabled?: boolean;
@@ -22,67 +22,15 @@ interface ButtonProps {
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
   fullWidth?: boolean;
+  children?: React.ReactNode;
 }
 
-export const Button: React.FC<ButtonProps> = ({
-  onPress,
-  title,
-  variant = 'primary',
-  size = 'medium',
-  disabled = false,
-  loading = false,
-  style,
-  textStyle,
-  fullWidth = false,
-}) => {
-  const buttonStyles = [
-    styles.base,
-    styles[variant],
-    styles[size],
-    fullWidth && styles.fullWidth,
-    disabled && styles.disabled,
-    style,
-  ];
-
-  const textStyles = [
-    styles.text,
-    styles[`${variant}Text`],
-    styles[`${size}Text`],
-    disabled && styles.disabledText,
-    textStyle,
-  ];
-
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      disabled={disabled || loading}
-      style={buttonStyles}
-      activeOpacity={0.8}>
-      {loading ? (
-        <ActivityIndicator color={variant === 'outline' ? '#007AFF' : '#fff'} />
-      ) : (
-        <Text style={textStyles}>{title}</Text>
-      )}
-    </TouchableOpacity>
-  );
-};
-
-const styles = StyleSheet.create({
-  base: {
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  fullWidth: {
-    width: '100%',
-  },
-  // Variants
+const buttonStyles: Record<ButtonVariant, ViewStyle> = {
   primary: {
     backgroundColor: '#007AFF',
   },
   secondary: {
-    backgroundColor: '#5856D6',
+    backgroundColor: '#e8f0fe',
   },
   outline: {
     backgroundColor: 'transparent',
@@ -92,7 +40,12 @@ const styles = StyleSheet.create({
   danger: {
     backgroundColor: '#FF3B30',
   },
-  // Sizes
+  ghost: {
+    backgroundColor: 'transparent',
+  },
+};
+
+const sizeStyles: Record<ButtonSize, ViewStyle> = {
   small: {
     paddingVertical: 8,
     paddingHorizontal: 12,
@@ -105,35 +58,115 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 20,
   },
-  // States
+};
+
+const textStyles: Record<ButtonVariant, TextStyle> = {
+  primary: {
+    color: '#FFFFFF',
+  },
+  secondary: {
+    color: '#FFFFFF',
+  },
+  outline: {
+    color: '#007AFF',
+  },
+  danger: {
+    color: '#FFFFFF',
+  },
+  ghost: {
+    color: '#000',
+  },
+};
+
+const textSizeStyles: Record<ButtonSize, TextStyle> = {
+  small: {
+    fontSize: 14,
+  },
+  medium: {
+    fontSize: 16,
+  },
+  large: {
+    fontSize: 18,
+  },
+};
+
+export const Button = React.memo<ButtonProps>(
+  ({
+    onPress,
+    title,
+    variant = 'primary',
+    size = 'medium',
+    disabled = false,
+    loading = false,
+    style,
+    textStyle,
+    fullWidth = false,
+    children,
+  }) => {
+    const buttonStyleArray = React.useMemo(
+      () => [
+        styles.base,
+        buttonStyles[variant],
+        sizeStyles[size],
+        fullWidth && styles.fullWidth,
+        disabled && styles.disabled,
+        style,
+      ],
+      [variant, size, fullWidth, disabled, style]
+    );
+
+    const textStyleArray = React.useMemo(
+      () => [
+        styles.text,
+        textStyles[variant],
+        textSizeStyles[size],
+        disabled && styles.disabledText,
+        textStyle,
+      ],
+      [variant, size, disabled, textStyle]
+    );
+
+    const spinnerColor = React.useMemo(
+      () => (variant === 'outline' ? '#007AFF' : '#fff'),
+      [variant]
+    );
+
+    return (
+      <TouchableOpacity
+        onPress={onPress}
+        disabled={disabled || loading}
+        style={buttonStyleArray}
+        activeOpacity={0.8}>
+        {loading ? (
+          <ActivityIndicator color={spinnerColor} />
+        ) : children ? (
+          children
+        ) : (
+          <Text style={textStyleArray}>{title}</Text>
+        )}
+      </TouchableOpacity>
+    );
+  }
+);
+
+Button.displayName = 'Button';
+
+const styles = StyleSheet.create({
+  base: {
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  fullWidth: {
+    width: '100%',
+  },
   disabled: {
     opacity: 0.5,
   },
-  // Text styles
   text: {
     fontWeight: '600',
     textAlign: 'center',
-  },
-  primaryText: {
-    color: '#FFFFFF',
-  },
-  secondaryText: {
-    color: '#FFFFFF',
-  },
-  outlineText: {
-    color: '#007AFF',
-  },
-  dangerText: {
-    color: '#FFFFFF',
-  },
-  smallText: {
-    fontSize: 14,
-  },
-  mediumText: {
-    fontSize: 16,
-  },
-  largeText: {
-    fontSize: 18,
   },
   disabledText: {
     opacity: 0.7,

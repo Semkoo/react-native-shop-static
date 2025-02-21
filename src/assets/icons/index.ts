@@ -12,3 +12,5 @@ export { ChevronDownIcon } from './ChevronDown';
 export { ChevronUpIcon } from './ChevronUp';
 export { TrashIcon } from './Trash';
 export { CheckIcon } from './Check';
+export { PlusIcon } from './Plus';
+export { MinusIcon } from './Minus';
