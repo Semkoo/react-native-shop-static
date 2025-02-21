@@ -8,3 +8,7 @@ export const ICON_SIZE = {
 
 export { CombineIcon } from './Combine';
 export { ShoppingCartIcon } from './ShoppingCart';
+export { ChevronDownIcon } from './ChevronDown';
+export { ChevronUpIcon } from './ChevronUp';
+export { TrashIcon } from './Trash';
+export { CheckIcon } from './Check';

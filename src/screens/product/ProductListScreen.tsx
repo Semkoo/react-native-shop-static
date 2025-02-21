@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
-import { FlatList, StyleSheet, Dimensions, SafeAreaView, View } from 'react-native';
+import React, { useCallback, useEffect } from 'react';
+import { FlatList, StyleSheet, SafeAreaView, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CollectionStackParamList } from '../../navigation/types';
 import { api } from '../../services/api';
 import { Product } from '../../types/product';
-import { LoadingScreen } from '../../components/ui/LoadingScreen';
-import { ErrorScreen } from '../../components/ui/ErrorScreen';
+import { LoadingScreen } from '../../components/LoadingScreen';
+import { ErrorScreen } from '../../components/ErrorScreen';
 import { ProductCard } from '../../components/ProductCard';
 import useGridDimensions from '../../hooks/useGridDimensions';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { Typography } from './Typography';
+import { Typography } from './ui/Typography';
 
 interface LoadingScreenProps {
   message?: string;

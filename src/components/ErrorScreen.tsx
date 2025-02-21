@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Typography } from './Typography';
-import { Button } from './Button';
+import { Typography } from './ui/Typography';
+import { Button } from './ui/Button';
 
 interface ErrorScreenProps {
   title?: string;

@@ -1,25 +1,17 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  Image,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  Pressable,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, Image, ScrollView, StyleSheet, Pressable } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CollectionStackParamList } from '../../navigation/types';
 import { useCart } from '../../state/CartContext';
 import { api } from '../../services/api';
 import { Product } from '../../types/product';
-import { ErrorScreen } from '../../components/ui/ErrorScreen';
-import { LoadingScreen } from '../../components/ui/LoadingScreen';
+import { ErrorScreen } from '../../components/ErrorScreen';
+import { LoadingScreen } from '../../components/LoadingScreen';
 import { Card } from '../../components/ui/Card';
 import { Typography } from '../../components/ui/Typography';
 import { formatCurrency } from '../../utils/formatCurrency';
 import { Button } from '../../components/ui/Button';
+import { Select, SelectItem } from '../../components/ui/Select';
 
 type Props = NativeStackScreenProps<CollectionStackParamList, 'ProductDetails'>;
 
@@ -29,7 +21,6 @@ const ProductDetailsScreen = ({ route }: Props) => {
   const [loading, setLoading] = React.useState(true);
   const [product, setProduct] = React.useState<Product | null>(null);
   const [selectedVariantId, setSelectedVariantId] = React.useState<string>('');
-  const [showVariants, setShowVariants] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -92,34 +83,24 @@ const ProductDetailsScreen = ({ route }: Props) => {
           )}
         </Typography>
 
-        {/* Variant Selection */}
-        <Pressable style={styles.variantSelector} onPress={() => setShowVariants(!showVariants)}>
-          <Typography variant="body">Selected: {selectedVariant?.title || 'Default'}</Typography>
-          <Typography variant="body">{showVariants ? '▼' : '▶'}</Typography>
-        </Pressable>
-
-        {showVariants && (
-          <View style={styles.variantList}>
-            {product.variants.map(variant => (
-              <Pressable
-                key={variant.id}
-                style={[
-                  styles.variantItem,
-                  selectedVariantId === variant.id && styles.selectedVariant,
-                  !variant.availableForSale && styles.unavailableVariant,
-                ]}
-                onPress={() => variant.availableForSale && setSelectedVariantId(variant.id)}>
-                <Typography
-                  variant="body"
-                  color={!variant.availableForSale ? '#999' : undefined}
-                  style={!variant.availableForSale && styles.unavailableText}>
-                  {variant.title}
-                  {!variant.availableForSale && ' (Out of Stock)'}
-                </Typography>
-              </Pressable>
-            ))}
-          </View>
-        )}
+        <Select
+          value={selectedVariant?.title || 'Select a variant'}
+          onValueChange={variantId => setSelectedVariantId(variantId)}>
+          {product.variants.map(variant => (
+            <SelectItem
+              key={variant.id}
+              value={variant.id}
+              isSelected={selectedVariant?.id === variant.id}>
+              <Typography
+                variant="body"
+                color={!variant.availableForSale ? '#999' : undefined}
+                style={!variant.availableForSale && styles.unavailableText}>
+                {variant.title}
+                {!variant.availableForSale && ' (Out of Stock)'}
+              </Typography>
+            </SelectItem>
+          ))}
+        </Select>
 
         <Typography variant="body" style={styles.description}>
           {product.description}
@@ -153,33 +134,10 @@ const styles = StyleSheet.create({
     margin: 16,
   },
   price: {
-    marginTop: 8,
+    marginVertical: 8,
   },
   description: {
     marginTop: 16,
-  },
-  variantSelector: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 12,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
-    marginTop: 16,
-  },
-  variantList: {
-    marginTop: 8,
-  },
-  variantItem: {
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 8,
-  },
-  selectedVariant: {
-    backgroundColor: '#e8f0fe',
-  },
-  unavailableVariant: {
-    opacity: 0.5,
   },
   unavailableText: {
     textDecorationLine: 'line-through',
