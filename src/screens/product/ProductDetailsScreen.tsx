@@ -84,13 +84,14 @@ const ProductDetailsScreen = ({ route }: Props) => {
         </Typography>
 
         <Select
-          value={selectedVariant?.title || 'Select a variant'}
+          value={selectedVariant?.title || 'Out of Stock'}
           onValueChange={variantId => setSelectedVariantId(variantId)}>
           {product.variants.map(variant => (
             <SelectItem
               key={variant.id}
               value={variant.id}
-              isSelected={selectedVariant?.id === variant.id}>
+              isSelected={selectedVariant?.id === variant.id}
+              isDisabled={!variant.availableForSale}>
               <Typography
                 variant="body"
                 color={!variant.availableForSale ? '#999' : undefined}

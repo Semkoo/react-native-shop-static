@@ -1,21 +1,35 @@
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
-# Project Implementation
+# Project Overview
 
-## Architecture Overview
+This project is a mobile app for a fictional clothing store. It allows users to view products, add them to a cart.
+
+## Screenshots
+
+| Screen | Screenshot | Description |
+| ------ | ---------- | ----------- |
+| Home Screen | <img src="./screenshots/home-screen.png" width="250px" alt="Home Screen" /> | Browse featured products and collections |
+| Product Details | <img src="./screenshots/product-details-screen.png" width="250px" alt="Product Details" /> | View detailed product information including price, description and available variants |
+| Variant Selector | <img src="./screenshots/product-details-variant-selector.png" width="250px" alt="Variant Selector" /> | Select product options like size and color |
+| Cart | <img src="./screenshots/cart-screen.png" width="250px" alt="Cart" /> | Review items in cart, update quantities, and proceed to checkout |
+| Remove Item | <img src="./screenshots/cart-remove-item-alert.png" width="250px" alt="Remove Item Alert" /> | Confirmation dialog when removing items from cart |
+
+## Project Implementation
+
+### Architecture Overview
 
 This project follows a clean architecture pattern with the following structure:
 
 - `src/` - Main source directory
-  - `components/` - Reusable UI components
-  - `screens/` - Screen components
-  - `navigation/` - Navigation configuration
-  - `services/` - API and business logic
-  - `state/` - State management - React Context
-  - `types/` - TypeScript type definitions
-  - `utils/` - Helper functions and utilities
+  - `components/` - Reusable UI components (e.g. `Button`, `Typography`, `Select`, `Card`)
+  - `screens/` - Screen components (e.g. `HomeScreen`, `ProductDetailsScreen`, `CartScreen`)
+  - `navigation/` - Navigation configuration (e.g. `AppNavigator`, `CollectionStackNavigator`)
+  - `services/` - API and business logic (e.g. `api`, `cart`)
+  - `state/` - State management - React Context (e.g. `CartContext`)
+  - `types/` - TypeScript type definitions (e.g. `Product`, `CartItem`)
+  - `utils/` - Helper functions and utilities (e.g. `formatCurrency`)
 
-## Tech Stack
+### Tech Stack
 
 - **Framework**: Pure React Native (No Expo)
 - **Language**: TypeScript
@@ -25,11 +39,11 @@ This project follows a clean architecture pattern with the following structure:
 - **Testing**: Jest & React Native Testing Library
 - **Code Quality**: ESLint, Prettier
 
-## Development Setup
+### Development Setup
 
 > **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
 
-### Step 1: Start Metro
+##### Step 1: Start Metro
 
 First, you will need to run **Metro**, the JavaScript build tool for React Native.
 
@@ -43,11 +57,11 @@ npm start
 yarn start
 ```
 
-### Step 2: Build and run your app
+##### Step 2: Build and run your app
 
 With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
 
-#### Android
+##### Android
 
 ```sh
 # Using npm
@@ -57,7 +71,7 @@ npm run android
 yarn android
 ```
 
-#### iOS
+##### iOS
 
 For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
 
@@ -88,7 +102,7 @@ If everything is set up correctly, you should see your new app running in the An
 
 This is one way to run your app — you can also build it directly from Android Studio or Xcode.
 
-### Step 3: Modify your app
+##### Step 3: Modify your app
 
 Now that you have successfully run the app, let's make changes!
 
@@ -99,16 +113,16 @@ When you want to forcefully reload, for example to reset the state of your app, 
 - **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
 - **iOS**: Press <kbd>R</kbd> in iOS Simulator.
 
-#### Now what?
+##### Now what?
 
 - If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
 - If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
 
-# Troubleshooting
+#### Troubleshooting
 
 If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
 
-# Learn More
+#### Learn More
 
 To learn more about React Native, take a look at the following resources:
 
